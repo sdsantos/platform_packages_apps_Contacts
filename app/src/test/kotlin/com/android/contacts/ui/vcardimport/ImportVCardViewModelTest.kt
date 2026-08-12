@@ -1,16 +1,16 @@
-package com.android.contacts.ui.vcard
+package com.android.contacts.ui.vcardimport
 
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
+import com.android.contacts.domain.vcard.model.ImportVCardError as Error
 import com.android.contacts.domain.vcard.usecase.BuildVCardSource
 import com.android.contacts.domain.vcard.usecase.ImportVCards
 import com.android.contacts.tests.MainDispatcherRule
 import com.android.contacts.tests.factory.AccountModelFactory
 import com.android.contacts.tests.factory.ImportVCardSourceFactory
-import com.android.contacts.ui.vcard.screen.ImportVCardViewModel
-import com.android.contacts.ui.vcard.screen.model.ImportVCardAction as Action
-import com.android.contacts.ui.vcard.screen.model.ImportVCardEffect as Effect
-import com.android.contacts.ui.vcard.screen.model.ImportVCardError as Error
+import com.android.contacts.ui.vcardimport.screen.ImportVCardViewModel
+import com.android.contacts.ui.vcardimport.screen.model.ImportVCardAction as Action
+import com.android.contacts.ui.vcardimport.screen.model.ImportVCardEffect as Effect
 import com.android.contacts.util.core.IsPermissionGranted
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -192,7 +192,7 @@ class ImportVCardViewModelTest {
                 savedStateHandle = SavedStateHandle(
                     mapOf(
                         ImportVCardViewModel.KEY_SOURCES to listOf(
-                            ImportVCardSourceFactory.build()
+                            ImportVCardSourceFactory.build(),
                         ),
                         ImportVCardViewModel.KEY_ACCOUNT to AccountModelFactory.build(),
                     ),
