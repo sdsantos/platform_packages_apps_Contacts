@@ -26,7 +26,6 @@ import com.android.contacts.ui.simimport.screen.model.SimImportUiState as State
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.collections.immutable.toImmutableList
-import kotlinx.collections.immutable.toImmutableSet
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -95,7 +94,9 @@ internal class SimImportViewModel @Inject constructor(
     init {
         if (subscriptionId != SimCard.NO_SUBSCRIPTION_ID) {
             loadSimCards()
-                .filter { simCards -> simCards.none { it.subscriptionId == subscriptionId } }
+                .filter { simCards ->
+                    simCards.isNotEmpty() && simCards.none { it.subscriptionId == subscriptionId }
+                }
                 .take(1)
                 .onEach {
                     Log.i(TAG, "SIM card removed, aborting SIM import.")
@@ -203,7 +204,7 @@ internal class SimImportViewModel @Inject constructor(
 
     private fun restoreDeselectedContacts(): Map<AccountModel, Set<Int>> {
         val entries = savedStateHandle.get<List<AccountContactsEntry>>(KEY_DESELECTED_CONTACTS)
-        return entries?.associate { it.account to it.contactNumbers.toImmutableSet() }.orEmpty()
+        return entries?.associate { it.account to it.contactNumbers }.orEmpty()
     }
 
     private fun findCurrentAccount(accounts: List<AccountDisplayModel>): AccountDisplayModel? {

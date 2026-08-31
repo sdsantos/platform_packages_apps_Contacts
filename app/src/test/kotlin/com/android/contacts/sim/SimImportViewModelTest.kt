@@ -9,6 +9,7 @@ import com.android.contacts.domain.sim.model.SimContactsResult
 import com.android.contacts.domain.sim.usecase.LoadSimCards
 import com.android.contacts.domain.sim.usecase.LoadSimContacts
 import com.android.contacts.domain.sim.usecase.StartSimImport
+import com.android.contacts.model.SimCard
 import com.android.contacts.model.SimContact
 import com.android.contacts.tests.AccountDisplayModelFactory
 import com.android.contacts.tests.MainDispatcherRule
@@ -51,14 +52,46 @@ class SimImportViewModelTest {
     fun subscriptionId_whenSimCardDoesNotExist_closes() =
         runTest(mainDispatcherRule.testDispatcher) {
             val subscriptionId = 2
+            val anotherSimCard = SimCard("", 3, "", "", "", "")
             val subject = createViewModel(
                 savedStateHandle = SavedStateHandle(
                     mapOf(UIIntents.EXTRA_SUBSCRIPTION_ID to subscriptionId),
                 ),
-                loadSimCards = { flowOf(listOf()) },
+                loadSimCards = { flowOf(listOf(SimCard(anotherSimCard))) },
             )
             subject.effects.test {
                 assertEquals(Effect.Close(isSuccessful = false), awaitItem())
+            }
+        }
+
+    @Test
+    fun subscriptionId_whenThereAreNotSimCards_doesNotClose() =
+        runTest(mainDispatcherRule.testDispatcher) {
+            val subscriptionId = 2
+            val subject = createViewModel(
+                savedStateHandle = SavedStateHandle(
+                    mapOf(UIIntents.EXTRA_SUBSCRIPTION_ID to subscriptionId),
+                ),
+                loadSimCards = { flowOf(emptyList()) },
+            )
+            subject.effects.test {
+                expectNoEvents()
+            }
+        }
+
+    @Test
+    fun subscriptionId_whenThereIsTheSimCard_doesNotClose() =
+        runTest(mainDispatcherRule.testDispatcher) {
+            val subscriptionId = 2
+            val simCard = SimCard("", subscriptionId, "", "", "", "")
+            val subject = createViewModel(
+                savedStateHandle = SavedStateHandle(
+                    mapOf(UIIntents.EXTRA_SUBSCRIPTION_ID to subscriptionId),
+                ),
+                loadSimCards = { flowOf(listOf(simCard)) },
+            )
+            subject.effects.test {
+                expectNoEvents()
             }
         }
 

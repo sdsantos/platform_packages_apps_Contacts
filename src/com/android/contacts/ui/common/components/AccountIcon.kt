@@ -17,7 +17,10 @@ import com.android.contacts.ui.simimport.screen.model.AccountUiModel
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
 
 @Composable
-internal fun AccountIcon(account: AccountUiModel) {
+internal fun AccountIcon(
+    account: AccountUiModel,
+    modifier: Modifier = Modifier,
+) {
     val context = LocalContext.current
     Image(
         painter = account.getDisplayIcon(context)
@@ -26,7 +29,7 @@ internal fun AccountIcon(account: AccountUiModel) {
         // contentDescription set in parent
         contentDescription = null,
         contentScale = ContentScale.Crop,
-        modifier = Modifier
+        modifier = modifier
             .size(24.dp),
     )
 }
