@@ -49,6 +49,15 @@
     <!-- Activity title when the user is selecting a new label member. [CHAR LIMIT=128] -->
     <string name="groupMemberPickerActivityTitle">Select</string>
 
+    <!-- Contact selection screen title when contacts are selected -->
+    <plurals name="contactPickerSelectedTitle">
+        <item quantity="one"><xliff:g id="count">%d</xliff:g> selected</item>
+        <item quantity="other"><xliff:g id="count">%d</xliff:g> selected</item>
+    </plurals>
+
+    <!-- Contact selection submit button when multiple selection is available -->
+    <string name="contactPickerDoneButton">Done</string>
+
     <!-- Entry that prompts user to select a newly created contact.  [CHAR LIMIT=30] -->
     <string name="header_entry_contact_list_adapter_header_title">Create new contact</string>
 

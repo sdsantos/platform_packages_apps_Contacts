@@ -14,18 +14,18 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.toggleableState
 import androidx.compose.ui.state.ToggleableState
-import com.android.contacts.ui.common.components.cellShape
 import com.android.contacts.ui.contactdetails.common.ContactDetailsAccountRow
 import com.android.contacts.ui.contactdetails.common.ContactDetailsActionRow
 import com.android.contacts.ui.contactdetails.common.ContactDetailsRecentCallRow
-import com.android.contacts.ui.contactdetails.common.ContactDetailsTokens as Tokens
 import com.android.contacts.ui.contactdetails.common.imageVector
 import com.android.contacts.ui.contactdetails.screen.model.CONTACT_DETAILS_SETTING_TEST_TAG_PREFIX
 import com.android.contacts.ui.contactdetails.screen.model.ContactAccountUiModel
-import com.android.contacts.ui.contactdetails.screen.model.ContactDetailsAction as Action
 import com.android.contacts.ui.contactdetails.screen.model.ContactSettingUiModel
 import com.android.contacts.ui.contactdetails.screen.model.RecentCallUiModel
+import com.android.contacts.ui.core.itemClipShape
 import kotlinx.collections.immutable.ImmutableList
+import com.android.contacts.ui.contactdetails.common.ContactDetailsTokens as Tokens
+import com.android.contacts.ui.contactdetails.screen.model.ContactDetailsAction as Action
 
 @Composable
 internal fun ContactDetailsSection(
@@ -50,7 +50,7 @@ private fun ContactDetailsSectionHeader(
 ) {
     Surface(
         color = MaterialTheme.colorScheme.surfaceContainerLow,
-        shape = cellShape(
+        shape = itemClipShape(
             isFirst = true,
             isLast = false,
         ),
