@@ -7,6 +7,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.android.contacts.ContactSaveService
 import com.android.contacts.DynamicShortcuts
 import com.android.contacts.database.SimContactDao
+import com.android.contacts.list.ContactListFilterController
 import com.android.contacts.model.AccountTypeManager
 import com.android.contacts.preference.ContactsPreferences
 import com.android.contacts.util.DeviceLocalAccountTypeFactory
@@ -35,6 +36,14 @@ internal class DataProvidesModule {
         @ApplicationContext context: Context,
     ): AccountTypeManager {
         return AccountTypeManager.getInstance(context)
+    }
+
+    @Provides
+    @Reusable
+    fun contactListFilterController(
+        @ApplicationContext context: Context,
+    ): ContactListFilterController {
+        return ContactListFilterController.getInstance(context)
     }
 
     @Provides

@@ -18,6 +18,8 @@ import com.android.contacts.data.contacts.delegate.QueryJoinSuggestionsRepositor
 import com.android.contacts.data.contacts.delegate.QueryJoinSuggestionsRepositoryDelegateImpl
 import com.android.contacts.data.contacts.delegate.QueryLegacyContactsRepositoryDelegate
 import com.android.contacts.data.contacts.delegate.QueryLegacyContactsRepositoryDelegateImpl
+import com.android.contacts.data.contacts.delegate.SearchContactsRepositoryDelegate
+import com.android.contacts.data.contacts.delegate.SearchContactsRepositoryDelegateImpl
 import javax.inject.Inject
 
 internal interface ContactsRepository :
@@ -29,7 +31,8 @@ internal interface ContactsRepository :
     QueryContactsRepositoryDelegate,
     QueryDirectoryContactsRepositoryDelegate,
     QueryJoinSuggestionsRepositoryDelegate,
-    QueryLegacyContactsRepositoryDelegate
+    QueryLegacyContactsRepositoryDelegate,
+    SearchContactsRepositoryDelegate
 
 internal class ContactsRepositoryImpl @Inject constructor(
     private val getContactDataValuesDelegateImpl: GetContactDataValuesRepositoryDelegateImpl,
@@ -42,6 +45,7 @@ internal class ContactsRepositoryImpl @Inject constructor(
     QueryDirectoryContactsRepositoryDelegateImpl,
     private val queryJoinSuggestionsDelegateImpl: QueryJoinSuggestionsRepositoryDelegateImpl,
     private val queryLegacyContactsDelegateImpl: QueryLegacyContactsRepositoryDelegateImpl,
+    private val searchContactsDelegateImpl: SearchContactsRepositoryDelegateImpl,
 ) : ContactsRepository,
     GetContactDataValuesRepositoryDelegate by getContactDataValuesDelegateImpl,
     GetContactsCountDelegate by getContactsCountDelegateImpl,
@@ -51,4 +55,5 @@ internal class ContactsRepositoryImpl @Inject constructor(
     QueryContactsRepositoryDelegate by queryContactsRepositoryDelegateImpl,
     QueryDirectoryContactsRepositoryDelegate by queryDirectoryContactsRepositoryDelegateImpl,
     QueryJoinSuggestionsRepositoryDelegate by queryJoinSuggestionsDelegateImpl,
-    QueryLegacyContactsRepositoryDelegate by queryLegacyContactsDelegateImpl
+    QueryLegacyContactsRepositoryDelegate by queryLegacyContactsDelegateImpl,
+    SearchContactsRepositoryDelegate by searchContactsDelegateImpl

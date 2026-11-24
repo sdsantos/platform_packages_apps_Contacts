@@ -5,7 +5,6 @@ import android.content.ActivityNotFoundException
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Intent
-import android.icu.text.MessageFormat
 import android.media.RingtoneManager
 import android.net.Uri
 import android.provider.CallLog.Calls
@@ -27,6 +26,7 @@ import com.android.contacts.editor.EditorIntents
 import com.android.contacts.editor.EditorUiUtils
 import com.android.contacts.interactions.ContactDeletionInteraction
 import com.android.contacts.list.UiIntentActions
+import com.android.contacts.ui.common.util.ContactShareIntents
 import com.android.contacts.ui.contactdetails.ContactDetailsLaunchers
 import com.android.contacts.ui.contactdetails.screen.model.ContactDetailsAction as Action
 import com.android.contacts.ui.contactdetails.screen.model.ContactDetailsEffect as Effect
@@ -34,7 +34,6 @@ import com.android.contacts.ui.group.detail.GroupActivity
 import com.android.contacts.ui.interactions.callsubject.CallSubjectActivity
 import com.android.contacts.ui.selection.ContactSelectionActivity
 import com.android.contacts.util.ImplicitIntentsUtil
-import java.util.Locale
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -109,28 +108,13 @@ internal class ContactDetailsEffectHandlerImpl(
     }
 
     private fun shareContact(lookupKey: String) {
-        val shareUri = Uri.withAppendedPath(Contacts.CONTENT_VCARD_URI, lookupKey)
-        val intent = Intent(Intent.ACTION_SEND)
-            .setType(Contacts.CONTENT_VCARD_TYPE)
-            .putExtra(Intent.EXTRA_STREAM, shareUri)
+        val intent = ContactShareIntents.build(activity, listOf(lookupKey)) ?: return
 
         try {
-            ImplicitIntentsUtil.startActivityOutsideApp(
-                activity,
-                Intent.createChooser(intent, shareTitle()),
-            )
+            ImplicitIntentsUtil.startActivityOutsideApp(activity, intent)
         } catch (e: ActivityNotFoundException) {
             showToast(R.string.share_error, e)
         }
-    }
-
-    private fun shareTitle(): CharSequence {
-        val format = MessageFormat(
-            activity.getString(R.string.title_share_via),
-            Locale.getDefault(),
-        )
-
-        return format.format(mapOf("count" to 1))
     }
 
     private fun pickRingtone(currentRingtone: String?) {

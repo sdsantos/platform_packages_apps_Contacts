@@ -93,8 +93,8 @@ internal class GroupMembersRepositoryTest {
     @Test
     fun queryGroupMembers_mapsRows() = runTest {
         contentResolver.givenQueryRows(
-            arrayOf(1L, "Alice", "Alice", null, 1),
-            arrayOf(2L, null, null, null, 0),
+            arrayOf(1L, "Alice", "Alice", null, 1, null),
+            arrayOf(2L, null, null, null, 0, null),
         )
 
         val result = subject.queryGroupMembers(7L, SortOrder.GIVEN_NAME_FIRST).first()
@@ -125,12 +125,12 @@ internal class GroupMembersRepositoryTest {
     @Test
     fun queryGroupMembers_whenContactsChange_emitsAgain() = runTest {
         val observerSlot = contentResolver.givenRegisteredContentObserver()
-        contentResolver.givenQueryRows(arrayOf(1L, "Alice", null, null, 0))
+        contentResolver.givenQueryRows(arrayOf(1L, "Alice", null, null, 0, null))
 
         subject.queryGroupMembers(7L, SortOrder.GIVEN_NAME_FIRST).test {
             assertEquals(1L, awaitItem().single().id)
 
-            contentResolver.givenQueryRows(arrayOf(2L, "Bob", null, null, 0))
+            contentResolver.givenQueryRows(arrayOf(2L, "Bob", null, null, 0, null))
             observerSlot.captured.onChange(false)
 
             assertEquals(2L, awaitItem().single().id)

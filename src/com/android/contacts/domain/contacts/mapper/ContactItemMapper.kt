@@ -30,6 +30,7 @@ internal class ContactItemMapperImpl @Inject constructor() : ContactItemMapper {
                 primary = column.displayNamePrimary,
                 alternative = column.displayNameAlternative,
             ),
+            lookupKey = column.lookupKey,
             contactPhoto = column.photo,
             sectionLabel = column.sectionLabel,
             isFavorite = column.isStarred,

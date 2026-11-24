@@ -222,9 +222,9 @@ class QueryContactsRepositoryDelegateTest {
     @Test
     fun queryContacts_mapsRows() = runTest {
         contentResolver.givenQueryRows(
-            arrayOf(1L, "Alice Smith", "Smith, Alice", "content://photo/1", 1),
-            arrayOf(2L, null, null, null, 0),
-            arrayOf(3L, "Bob", "Bob", " ", 0),
+            arrayOf(1L, "Alice Smith", "Smith, Alice", "content://photo/1", 1, "lookup-1"),
+            arrayOf(2L, null, null, null, 0, null),
+            arrayOf(3L, "Bob", "Bob", " ", 0, null),
         )
 
         val result = subject.queryContacts(null, SortOrder.GIVEN_NAME_FIRST).first()
@@ -233,6 +233,7 @@ class QueryContactsRepositoryDelegateTest {
             listOf(
                 ContactColumn(
                     id = 1L,
+                    lookupKey = "lookup-1",
                     displayNamePrimary = "Alice Smith",
                     displayNameAlternative = "Smith, Alice",
                     photo = ContactPhoto.Uri("content://photo/1"),
@@ -252,9 +253,9 @@ class QueryContactsRepositoryDelegateTest {
     @Test
     fun queryContacts_withAddressBookIndex_mapsSectionLabels() = runTest {
         contentResolver.givenQueryRows(
-            arrayOf(1L, "Alice", null, null, 0),
-            arrayOf(2L, "Amy", null, null, 0),
-            arrayOf(3L, "Bob", null, null, 0),
+            arrayOf(1L, "Alice", null, null, 0, null),
+            arrayOf(2L, "Amy", null, null, 0, null),
+            arrayOf(3L, "Bob", null, null, 0, null),
             extras = addressBookIndexExtras(arrayOf("A", "B"), intArrayOf(2, 1)),
         )
 
@@ -266,7 +267,7 @@ class QueryContactsRepositoryDelegateTest {
     @Test
     fun queryContacts_withMismatchedAddressBookIndex_ignoresSectionLabels() = runTest {
         contentResolver.givenQueryRows(
-            arrayOf(1L, "Alice", null, null, 0),
+            arrayOf(1L, "Alice", null, null, 0, null),
             extras = addressBookIndexExtras(arrayOf("A", "B"), intArrayOf(1)),
         )
 
@@ -298,12 +299,12 @@ class QueryContactsRepositoryDelegateTest {
     @Test
     fun queryContacts_whenContactsChange_emitsAgain() = runTest {
         val observerSlot = contentResolver.givenRegisteredContentObserver()
-        contentResolver.givenQueryRows(arrayOf(1L, "Alice", null, null, 0))
+        contentResolver.givenQueryRows(arrayOf(1L, "Alice", null, null, 0, null))
 
         subject.queryContacts(null, SortOrder.GIVEN_NAME_FIRST).test {
             assertEquals(1L, awaitItem().single().id)
 
-            contentResolver.givenQueryRows(arrayOf(2L, "Bob", null, null, 0))
+            contentResolver.givenQueryRows(arrayOf(2L, "Bob", null, null, 0, null))
             observerSlot.captured.onChange(false)
 
             assertEquals(2L, awaitItem().single().id)

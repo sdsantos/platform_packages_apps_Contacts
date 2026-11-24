@@ -31,21 +31,21 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 
-internal fun interface GetContactsForSelection {
+internal interface GetContacts {
     operator fun invoke(
         filter: ContactSelectionFilter,
-        searchQuery: String?,
+        searchQuery: String? = null,
     ): Flow<GetContactsForSelectionResult>
 }
 
-internal class GetContactsForSelectionImpl @Inject constructor(
+internal class GetContactsImpl @Inject constructor(
     private val contactsRepository: ContactsRepository,
     private val directoriesRepository: DirectoriesRepository,
     private val displaySettingsRepository: DisplaySettingsRepository,
     private val contactItemMapper: ContactItemMapper,
     private val contactDirectoryMapper: ContactDirectoryMapper,
     @param:DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
-) : GetContactsForSelection {
+) : GetContacts {
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun invoke(
@@ -134,6 +134,7 @@ internal class GetContactsForSelectionImpl @Inject constructor(
             searchQuery = searchQuery,
             sortOrder = sortOrder,
             account = filter.account,
+            requiredData = filter.requiredData,
         ).map { columns ->
             columns
                 .toContactItems(displayOrder)

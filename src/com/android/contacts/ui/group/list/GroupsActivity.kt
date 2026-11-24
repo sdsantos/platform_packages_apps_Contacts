@@ -79,7 +79,7 @@ class GroupsActivity :
     }
 
     companion object {
-        const val EXTRA_ACCOUNT = "account"
+        internal const val EXTRA_ACCOUNT = "account"
 
         @JvmStatic
         internal fun buildIntent(

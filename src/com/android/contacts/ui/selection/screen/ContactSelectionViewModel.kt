@@ -8,7 +8,7 @@ import com.android.contacts.domain.contacts.model.ContactItem
 import com.android.contacts.domain.contacts.model.ContactItemKey
 import com.android.contacts.domain.contacts.model.GetContactsForSelectionResult
 import com.android.contacts.domain.contacts.usecase.GetContact
-import com.android.contacts.domain.contacts.usecase.GetContactsForSelection
+import com.android.contacts.domain.contacts.usecase.GetContacts
 import com.android.contacts.ui.selection.ContactSelectionActivity
 import com.android.contacts.ui.selection.screen.mapper.ContactSelectionEffectMapper
 import com.android.contacts.ui.selection.screen.mapper.ContactSelectionFilterMapper
@@ -55,7 +55,7 @@ internal interface ContactSelectionScreenModel {
 @HiltViewModel
 internal class ContactSelectionViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    private val getContactsForSelection: GetContactsForSelection,
+    private val getContacts: GetContacts,
     private val getContact: GetContact,
     private val filterMapper: ContactSelectionFilterMapper,
     uiStateMapper: ContactSelectionUiStateMapper,
@@ -103,7 +103,7 @@ internal class ContactSelectionViewModel @Inject constructor(
             .debounceSearch()
             .distinctUntilChanged()
             .flatMapLatest { searchQuery ->
-                getContactsForSelection(filter, searchQuery)
+                getContacts(filter, searchQuery)
                     .map<_, Pair<String?, GetContactsForSelectionResult>?> { searchQuery to it }
             }
             .retainLatestState()

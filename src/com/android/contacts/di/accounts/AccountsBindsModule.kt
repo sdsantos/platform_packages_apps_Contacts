@@ -1,5 +1,7 @@
 package com.android.contacts.di.accounts
 
+import com.android.contacts.data.accounts.repository.AccountFilterRepository
+import com.android.contacts.data.accounts.repository.AccountFilterRepositoryImpl
 import com.android.contacts.domain.accounts.mapper.AccountDisplayModelMapper
 import com.android.contacts.domain.accounts.mapper.AccountDisplayModelMapperImpl
 import com.android.contacts.domain.accounts.mapper.AccountFilterMapper
@@ -8,6 +10,8 @@ import com.android.contacts.domain.accounts.mapper.AccountIconDataMapper
 import com.android.contacts.domain.accounts.mapper.AccountIconDataMapperImpl
 import com.android.contacts.domain.accounts.mapper.AccountModelMapper
 import com.android.contacts.domain.accounts.mapper.AccountModelMapperImpl
+import com.android.contacts.domain.accounts.usecase.CanCreateContactInAccount
+import com.android.contacts.domain.accounts.usecase.CanCreateContactInAccountImpl
 import com.android.contacts.domain.accounts.usecase.CanSwitchAccounts
 import com.android.contacts.domain.accounts.usecase.CanSwitchAccountsImpl
 import com.android.contacts.domain.accounts.usecase.GetDefaultAccount
@@ -44,6 +48,12 @@ internal abstract class AccountsBindsModule {
 
     @Binds
     @Reusable
+    abstract fun bindAccountFilterRepository(
+        impl: AccountFilterRepositoryImpl,
+    ): AccountFilterRepository
+
+    @Binds
+    @Reusable
     abstract fun bindAccountFilterItemMapper(
         impl: AccountFilterItemMapperImpl,
     ): AccountFilterItemMapper
@@ -59,6 +69,12 @@ internal abstract class AccountsBindsModule {
     abstract fun bindAccountIconDataMapper(
         impl: AccountIconDataMapperImpl,
     ): AccountIconDataMapper
+
+    @Binds
+    @Reusable
+    abstract fun bindCanCreateContactInAccount(
+        impl: CanCreateContactInAccountImpl,
+    ): CanCreateContactInAccount
 
     @Binds
     @Reusable

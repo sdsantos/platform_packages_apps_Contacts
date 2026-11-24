@@ -31,7 +31,7 @@ import com.android.contacts.ui.core.ContactsPreviewColumn
 import com.android.contacts.ui.core.itemClipShape
 
 private val ITEM_HORIZONTAL_PADDING = 16.dp
-private val ITEM_VERTICAL_PADDING = 12.dp
+private val ITEM_VERTICAL_PADDING = 10.dp
 private val CONTACT_AVATAR_SIZE = 36.dp
 
 @Composable

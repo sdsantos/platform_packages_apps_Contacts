@@ -10,14 +10,18 @@ import com.android.contacts.domain.contacts.mapper.ContactDirectoryMapper
 import com.android.contacts.domain.contacts.mapper.ContactDirectoryMapperImpl
 import com.android.contacts.domain.contacts.mapper.ContactItemMapper
 import com.android.contacts.domain.contacts.mapper.ContactItemMapperImpl
+import com.android.contacts.domain.contacts.mapper.ContactSnippetMapper
+import com.android.contacts.domain.contacts.mapper.ContactSnippetMapperImpl
 import com.android.contacts.domain.contacts.mapper.RawContactWithAccountMapper
 import com.android.contacts.domain.contacts.mapper.RawContactWithAccountMapperImpl
 import com.android.contacts.domain.contacts.usecase.GetContact
 import com.android.contacts.domain.contacts.usecase.GetContactImpl
-import com.android.contacts.domain.contacts.usecase.GetContactsForSelection
-import com.android.contacts.domain.contacts.usecase.GetContactsForSelectionImpl
+import com.android.contacts.domain.contacts.usecase.GetContacts
+import com.android.contacts.domain.contacts.usecase.GetContactsImpl
 import com.android.contacts.domain.contacts.usecase.LoadRawContacts
 import com.android.contacts.domain.contacts.usecase.LoadRawContactsImpl
+import com.android.contacts.domain.contacts.usecase.SearchContacts
+import com.android.contacts.domain.contacts.usecase.SearchContactsImpl
 import com.android.contacts.ui.common.mapper.ContactSectionedListMapper
 import com.android.contacts.ui.common.mapper.ContactSectionedListMapperImpl
 import com.android.contacts.ui.common.mapper.ContactUiModelMapper
@@ -105,8 +109,8 @@ internal abstract class ContactsBindsModule {
     @Binds
     @Reusable
     abstract fun bindGetContactsForSelection(
-        impl: GetContactsForSelectionImpl,
-    ): GetContactsForSelection
+        impl: GetContactsImpl,
+    ): GetContacts
 
     @Binds
     @Reusable
@@ -137,4 +141,16 @@ internal abstract class ContactsBindsModule {
     abstract fun bindContactDirectoryMapper(
         impl: ContactDirectoryMapperImpl,
     ): ContactDirectoryMapper
+
+    @Binds
+    @Reusable
+    abstract fun bindContactSnippetMapper(
+        impl: ContactSnippetMapperImpl,
+    ): ContactSnippetMapper
+
+    @Binds
+    @Reusable
+    abstract fun bindSearchContacts(
+        impl: SearchContactsImpl,
+    ): SearchContacts
 }

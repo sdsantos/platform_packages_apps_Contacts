@@ -40,7 +40,7 @@ import org.junit.Before
 import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
-internal class GetContactsForSelectionTest {
+internal class GetContactsTest {
 
     private val dispatcher = UnconfinedTestDispatcher()
     private val contactsRepository = mockk<ContactsRepository>()
@@ -48,7 +48,7 @@ internal class GetContactsForSelectionTest {
     private val displaySettingsRepository = mockk<DisplaySettingsRepository>()
     private val displaySettings = MutableStateFlow(DISPLAY_SETTINGS)
 
-    private val subject: GetContactsForSelection = GetContactsForSelectionImpl(
+    private val subject: GetContacts = GetContactsImpl(
         contactsRepository = contactsRepository,
         directoriesRepository = directoriesRepository,
         displaySettingsRepository = displaySettingsRepository,

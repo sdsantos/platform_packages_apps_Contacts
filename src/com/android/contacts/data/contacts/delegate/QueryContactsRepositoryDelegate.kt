@@ -4,7 +4,9 @@ import android.content.ContentResolver
 import android.database.Cursor
 import android.net.Uri
 import android.provider.ContactsContract
+import android.provider.ContactsContract.CommonDataKinds.Email
 import android.provider.ContactsContract.Contacts
+import android.provider.ContactsContract.Data
 import androidx.annotation.VisibleForTesting
 import com.android.contacts.data.contacts.delegate.util.addressBookSectionLabels
 import com.android.contacts.data.contacts.delegate.util.appendAddressBookIndex
@@ -16,6 +18,7 @@ import com.android.contacts.data.contacts.model.ContactColumn
 import com.android.contacts.data.settings.model.SortOrder
 import com.android.contacts.di.core.IoDispatcher
 import com.android.contacts.domain.accounts.model.AccountModel
+import com.android.contacts.domain.contacts.model.ContactDataRequirement
 import com.android.contacts.util.core.observeContentUri
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineDispatcher
@@ -29,6 +32,7 @@ internal interface QueryContactsRepositoryDelegate {
         sortOrder: SortOrder,
         account: AccountModel? = null,
         excludedContactId: Long? = null,
+        requiredData: Set<ContactDataRequirement> = emptySet(),
     ): Flow<List<ContactColumn>>
 }
 
@@ -42,14 +46,17 @@ internal class QueryContactsRepositoryDelegateImpl @Inject constructor(
         sortOrder: SortOrder,
         account: AccountModel?,
         excludedContactId: Long?,
+        requiredData: Set<ContactDataRequirement>,
     ): Flow<List<ContactColumn>> {
         return observeContentUri(contentResolver, Contacts.CONTENT_URI)
             .map {
                 val accountSelection = AccountQuerySelection.forAccount(account)
+                val selection = selection(accountSelection, excludedContactId, requiredData)
+                val selectionArgs = selectionArgs(accountSelection, excludedContactId, requiredData)
                 query(
                     uri = buildUri(searchQuery),
-                    selection = selection(accountSelection, excludedContactId),
-                    selectionArgs = selectionArgs(accountSelection, excludedContactId),
+                    selection = selection,
+                    selectionArgs = selectionArgs,
                     sortOrder = sortOrder,
                 )
             }
@@ -69,10 +76,15 @@ internal class QueryContactsRepositoryDelegateImpl @Inject constructor(
     private fun selection(
         accountQuerySelection: AccountQuerySelection,
         excludedContactId: Long?,
+        requiredData: Set<ContactDataRequirement>,
     ): String? {
         return listOfNotNull(
             accountSelection(accountQuerySelection),
             EXCLUDE_CONTACT_SELECTION.takeIf { excludedContactId != null },
+            HAS_PHONE_NUMBER_SELECTION.takeIf {
+                ContactDataRequirement.PHONE_NUMBER in requiredData
+            },
+            HAS_EMAIL_SELECTION.takeIf { ContactDataRequirement.EMAIL in requiredData },
         )
             .takeIf { it.isNotEmpty() }
             ?.joinToString(" AND ") { "($it)" }
@@ -85,9 +97,13 @@ internal class QueryContactsRepositoryDelegateImpl @Inject constructor(
     private fun selectionArgs(
         account: AccountQuerySelection,
         excludedContactId: Long?,
+        requiredData: Set<ContactDataRequirement>,
     ): Array<String>? {
+        // Order must match the clause order in selection()
         val accountArgs = account.rawContactSelectionArgs
-        return (accountArgs + excludedContactId?.toString())
+        val emailArg = Email.CONTENT_ITEM_TYPE
+            .takeIf { ContactDataRequirement.EMAIL in requiredData }
+        return (accountArgs + excludedContactId?.toString() + emailArg)
             .filterNotNull()
             .takeIf { it.isNotEmpty() }
             ?.toTypedArray()
@@ -116,15 +132,24 @@ internal class QueryContactsRepositoryDelegateImpl @Inject constructor(
             Contacts.DISPLAY_NAME_ALTERNATIVE,
             Contacts.PHOTO_THUMBNAIL_URI,
             Contacts.STARRED,
+            Contacts.LOOKUP_KEY,
         )
         private const val ID = 0
         private const val DISPLAY_NAME_PRIMARY = 1
         private const val DISPLAY_NAME_ALTERNATIVE = 2
         private const val PHOTO_THUMBNAIL_URI = 3
         private const val STARRED = 4
+        private const val LOOKUP_KEY = 5
 
         @VisibleForTesting
         const val EXCLUDE_CONTACT_SELECTION = Contacts._ID + "!=?"
+
+        private const val HAS_PHONE_NUMBER_SELECTION = Contacts.HAS_PHONE_NUMBER + "=1"
+
+        private const val HAS_EMAIL_SELECTION =
+            Contacts._ID + " IN (" +
+                "SELECT ${Data.CONTACT_ID} FROM view_data WHERE ${Data.MIMETYPE}=?" +
+                ")"
 
         private const val RAW_CONTACTS_SELECTION_PREFIX =
             Contacts._ID + " IN (" +
@@ -134,18 +159,23 @@ internal class QueryContactsRepositoryDelegateImpl @Inject constructor(
             val sectionLabels = addressBookSectionLabels()
             return buildList {
                 while (moveToNext()) {
-                    add(
-                        ContactColumn(
-                            id = getLong(ID),
-                            displayNamePrimary = getString(DISPLAY_NAME_PRIMARY),
-                            displayNameAlternative = getString(DISPLAY_NAME_ALTERNATIVE),
-                            photo = getContactPhoto(PHOTO_THUMBNAIL_URI),
-                            sectionLabel = sectionLabels.getOrNull(position),
-                            isStarred = getInt(STARRED) != 0,
-                        ),
-                    )
+                    add(toContactColumn(sectionLabels))
                 }
             }
+        }
+
+        internal fun Cursor.toContactColumn(
+            sectionLabels: List<String> = emptyList(),
+        ): ContactColumn {
+            return ContactColumn(
+                id = getLong(ID),
+                lookupKey = getString(LOOKUP_KEY),
+                displayNamePrimary = getString(DISPLAY_NAME_PRIMARY),
+                displayNameAlternative = getString(DISPLAY_NAME_ALTERNATIVE),
+                photo = getContactPhoto(PHOTO_THUMBNAIL_URI),
+                sectionLabel = sectionLabels.getOrNull(position),
+                isStarred = getInt(STARRED) != 0,
+            )
         }
     }
 }

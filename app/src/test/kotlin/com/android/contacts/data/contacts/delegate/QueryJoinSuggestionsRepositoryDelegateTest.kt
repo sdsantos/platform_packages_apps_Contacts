@@ -81,8 +81,8 @@ class QueryJoinSuggestionsRepositoryDelegateTest {
     @Test
     fun queryJoinSuggestions_mapsRows() = runTest {
         contentResolver.givenQueryRows(
-            arrayOf(1L, "Alice Smith", "Smith, Alice", "content://photo/1", 1),
-            arrayOf(2L, null, null, null, 0),
+            arrayOf(1L, "Alice Smith", "Smith, Alice", "content://photo/1", 1, null),
+            arrayOf(2L, null, null, null, 0, null),
         )
 
         val result = subject.queryJoinSuggestions(5L, null).first()
@@ -125,12 +125,12 @@ class QueryJoinSuggestionsRepositoryDelegateTest {
     @Test
     fun queryJoinSuggestions_whenContactsChange_emitsAgain() = runTest {
         val observerSlot = contentResolver.givenRegisteredContentObserver()
-        contentResolver.givenQueryRows(arrayOf(1L, "Alice", null, null, 0))
+        contentResolver.givenQueryRows(arrayOf(1L, "Alice", null, null, 0, null))
 
         subject.queryJoinSuggestions(5L, null).test {
             assertEquals(1L, awaitItem().single().id)
 
-            contentResolver.givenQueryRows(arrayOf(2L, "Bob", null, null, 0))
+            contentResolver.givenQueryRows(arrayOf(2L, "Bob", null, null, 0, null))
             observerSlot.captured.onChange(false)
 
             assertEquals(2L, awaitItem().single().id)

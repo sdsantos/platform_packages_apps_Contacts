@@ -5,6 +5,7 @@ import com.android.contacts.data.contactdetails.model.ContactPhoto
 internal data class ContactItem(
     val key: ContactItemKey,
     val name: String,
+    val lookupKey: String? = null,
     val contactPhoto: ContactPhoto? = null,
     val field: Field? = null,
     val sectionLabel: String? = null,

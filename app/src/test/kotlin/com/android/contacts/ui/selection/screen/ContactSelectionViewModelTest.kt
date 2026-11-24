@@ -7,7 +7,7 @@ import com.android.contacts.domain.contacts.model.ContactItemKey
 import com.android.contacts.domain.contacts.model.ContactSelectionFilter
 import com.android.contacts.domain.contacts.model.GetContactsForSelectionResult
 import com.android.contacts.domain.contacts.usecase.GetContact
-import com.android.contacts.domain.contacts.usecase.GetContactsForSelection
+import com.android.contacts.domain.contacts.usecase.GetContacts
 import com.android.contacts.tests.MainDispatcherRule
 import com.android.contacts.ui.selection.ContactSelectionActivity
 import com.android.contacts.ui.selection.screen.ContactSelectionViewModel.Companion.SEARCH_DEBOUNCE_MILLIS
@@ -54,7 +54,7 @@ internal class ContactSelectionViewModelTest {
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
 
-    private val getContactsForSelection = mockk<GetContactsForSelection>()
+    private val getContacts = mockk<GetContacts>()
     private val getContact = mockk<GetContact>()
     private val filterMapper = mockk<ContactSelectionFilterMapper>()
     private val effectMapper = mockk<ContactSelectionEffectMapper>()
@@ -70,7 +70,7 @@ internal class ContactSelectionViewModelTest {
     @Before
     fun setUp() {
         every { filterMapper.map(any()) } returns FILTER
-        every { getContactsForSelection(any(), any()) } returns flowOf(RESULT)
+        every { getContacts(any(), any()) } returns flowOf(RESULT)
         coEvery { effectMapper.map(any(), any()) } returns MAPPED_EFFECT
     }
 
@@ -130,7 +130,7 @@ internal class ContactSelectionViewModelTest {
             collectUiState(createViewModel(Mode.Pick(searchQuery = "john")))
 
             assertEquals(SearchState.Searching("john"), lastUiMapperCall.state.searchState)
-            verify { getContactsForSelection(FILTER, "john") }
+            verify { getContacts(FILTER, "john") }
         }
 
     @Test
@@ -157,13 +157,13 @@ internal class ContactSelectionViewModelTest {
         collectUiState(createViewModel(mode))
 
         verify { filterMapper.map(mode) }
-        verify(exactly = 1) { getContactsForSelection(FILTER, null) }
+        verify(exactly = 1) { getContacts(FILTER, null) }
         assertEquals(null to RESULT, lastUiMapperCall.contacts)
     }
 
     @Test
     fun contacts_beforeResults_areNull() = runTest(mainDispatcherRule.testDispatcher) {
-        every { getContactsForSelection(any(), any()) } returns emptyFlow()
+        every { getContacts(any(), any()) } returns emptyFlow()
 
         collectUiState(createViewModel())
 
@@ -182,13 +182,13 @@ internal class ContactSelectionViewModelTest {
             advanceTimeBy(STATE_TIMEOUT_MILLIS + 1)
             runCurrent()
 
-            every { getContactsForSelection(any(), any()) } returns emptyFlow()
+            every { getContacts(any(), any()) } returns emptyFlow()
             every { getContact(7L) } returns flow { awaitCancellation() }
             uiMapperCalls.clear()
             backgroundScope.launch { subject.uiState.collect {} }
             runCurrent()
 
-            verify(exactly = 2) { getContactsForSelection(FILTER, null) }
+            verify(exactly = 2) { getContacts(FILTER, null) }
             assertTrue(uiMapperCalls.isNotEmpty())
             assertTrue(uiMapperCalls.all { it.contacts == (null to RESULT) })
             assertTrue(uiMapperCalls.all { it.joinTarget === contact })
@@ -214,12 +214,12 @@ internal class ContactSelectionViewModelTest {
         advanceTimeBy(SEARCH_DEBOUNCE_MILLIS - 1)
         runCurrent()
 
-        verify(exactly = 0) { getContactsForSelection(FILTER, "john") }
+        verify(exactly = 0) { getContacts(FILTER, "john") }
 
         advanceTimeBy(2)
         runCurrent()
 
-        verify(exactly = 1) { getContactsForSelection(FILTER, "john") }
+        verify(exactly = 1) { getContacts(FILTER, "john") }
         assertEquals("john" to RESULT, lastUiMapperCall.contacts)
     }
 
@@ -234,8 +234,8 @@ internal class ContactSelectionViewModelTest {
             subject.onAction(Action.SearchQueryChange(" john "))
             advanceUntilIdle()
 
-            verify(exactly = 0) { getContactsForSelection(FILTER, "j") }
-            verify(exactly = 1) { getContactsForSelection(FILTER, "john") }
+            verify(exactly = 0) { getContacts(FILTER, "j") }
+            verify(exactly = 1) { getContacts(FILTER, "john") }
         }
 
     @Test
@@ -246,7 +246,7 @@ internal class ContactSelectionViewModelTest {
         subject.onAction(Action.SearchQueryChange(" "))
         runCurrent()
 
-        verify(exactly = 1) { getContactsForSelection(FILTER, null) }
+        verify(exactly = 1) { getContacts(FILTER, null) }
     }
 
     @Test
@@ -259,7 +259,7 @@ internal class ContactSelectionViewModelTest {
             advanceUntilIdle()
 
             assertEquals(SearchState.Searching(""), lastUiMapperCall.state.searchState)
-            verify(exactly = 1) { getContactsForSelection(any(), any()) }
+            verify(exactly = 1) { getContacts(any(), any()) }
         }
 
     // Join target
@@ -450,7 +450,7 @@ internal class ContactSelectionViewModelTest {
     private fun createViewModel(savedStateHandle: SavedStateHandle): ContactSelectionViewModel {
         return ContactSelectionViewModel(
             savedStateHandle = savedStateHandle,
-            getContactsForSelection = getContactsForSelection,
+            getContacts = getContacts,
             getContact = getContact,
             filterMapper = filterMapper,
             uiStateMapper = uiStateMapper,

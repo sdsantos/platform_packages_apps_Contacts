@@ -8,6 +8,7 @@ internal sealed interface ContactSelectionFilter {
         val account: AccountModel? = null,
         val includesDirectories: Boolean = false,
         val excludeIds: Set<Long> = emptySet(),
+        val requiredData: Set<ContactDataRequirement> = emptySet(),
     ) : ContactSelectionFilter
 
     data class JoinCandidates(

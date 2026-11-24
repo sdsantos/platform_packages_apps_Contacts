@@ -694,6 +694,21 @@
     <!-- Menu section title of "labels" [CHAR LIMIT=20] -->
     <string name="menu_title_groups">Labels</string>
 
+    <!-- Content description of the button that shows or hides the contact list filters [CHAR LIMIT=NONE] -->
+    <string name="home_filters">Filters</string>
+
+    <!-- Content description of the filters button when some filters are active [CHAR LIMIT=NONE] -->
+    <plurals name="home_filters_active">
+        <item quantity="one">Filters, <xliff:g id="count">%d</xliff:g> active</item>
+        <item quantity="other">Filters, <xliff:g id="count">%d</xliff:g> active</item>
+    </plurals>
+
+    <!-- Filter chip that shows only contacts with phone numbers [CHAR LIMIT=30] -->
+    <string name="home_filter_phone_contacts">Phone contacts</string>
+
+    <!-- Filter chip that shows only contacts with email addresses [CHAR LIMIT=30] -->
+    <string name="home_filter_email_contacts">Email contacts</string>
+
     <!-- The label for the action shown in a snackbar after an operation that modifies some data is performed.
          The user can click on the action to rollback the modification-->
     <string name="undo">Undo</string>
